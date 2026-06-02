@@ -1,0 +1,91 @@
+{% extends 'base.html' %}
+{% block title %}Admin Dashboard — NEXUS{% endblock %}
+{% block content %}
+
+<div class="browse-page" style="padding-top: 120px; min-height: 80vh;">
+    <div class="browse-header" style="margin-bottom: 40px;">
+        <h1 class="page-title">◈ ADMIN CONTROL CORE</h1>
+        <p>Welcome back, system administrator <strong>{{ user.username }}</strong></p>
+    </div>
+
+    <div style="display: flex; gap: 15px; margin-bottom: 40px;">
+        <a href="/admin/upload" class="btn-glow"
+            style="text-decoration: none; padding: 12px 24px; background: #00f2fe; color: #000; font-family: 'Orbitron', sans-serif; font-weight: 900; border-radius: 4px; box-shadow: 0 0 15px rgba(0,242,254,0.2); font-size: 13px; letter-spacing: 1px;">
+            ➕ UPLOAD NEW MEDIA
+        </a>
+        <a href="/admin/media" class="btn-outline"
+            style="text-decoration: none; padding: 12px 24px; border: 1px solid #00f2fe; color: #00f2fe; font-family: 'Orbitron', sans-serif; font-weight: 900; border-radius: 4px; font-size: 13px; letter-spacing: 1px;">
+            ☱ MANAGE EXISTING CATALOG
+        </a>
+    </div>
+
+    <div class="hero-stats"
+        style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); background: rgba(10, 10, 18, 0.6); padding: 30px; border-radius: 12px; border: 1px solid rgba(0, 255, 200, 0.15); margin-bottom: 50px; gap: 20px;">
+        <div class="stat" style="text-align: center;">
+            <span class="stat-num"
+                style="color: var(--cyan); display: block; font-size: 32px; font-weight: bold; font-family: 'Orbitron', sans-serif;">{{
+                total_songs }}</span>
+            <span class="stat-label" style="color: #94a3b8; font-size: 12px; text-transform: uppercase;">Audio
+                Tracks</span>
+        </div>
+        <div class="stat" style="text-align: center;">
+            <span class="stat-num"
+                style="color: var(--purple); display: block; font-size: 32px; font-weight: bold; font-family: 'Orbitron', sans-serif;">{{
+                total_movies }}</span>
+            <span class="stat-label" style="color: #94a3b8; font-size: 12px; text-transform: uppercase;">Films &
+                Series</span>
+        </div>
+        <div class="stat" style="text-align: center;">
+            <span class="stat-num"
+                style="display: block; font-size: 32px; font-weight: bold; font-family: 'Orbitron', sans-serif; color: #ffffff;">{{
+                total_users }}</span>
+            <span class="stat-label" style="color: #94a3b8; font-size: 12px; text-transform: uppercase;">Registered
+                Accounts</span>
+        </div>
+        <div class="stat" style="text-align: center;">
+            <span class="stat-num"
+                style="color: #ff0055; display: block; font-size: 32px; font-weight: bold; font-family: 'Orbitron', sans-serif;">{{
+                total_downloads }}</span>
+            <span class="stat-label" style="color: #94a3b8; font-size: 12px; text-transform: uppercase;">Total Downloads
+                Logs</span>
+        </div>
+    </div>
+
+    <div id="overview-view" class="admin-view-panel">
+        <div class="section-header">
+            <h2 class="section-title"><span class="title-accent">◈</span> RECENTLY PROVISIONED MEDIA IN SYSTEM</h2>
+        </div>
+
+        <div class="track-list" style="margin-top: 20px; display: flex; flex-direction: column; gap: 10px;">
+            {% for item in items %}
+            <div class="track-row"
+                style="cursor: default; display: flex; align-items: center; background: rgba(255,255,255,0.02); padding: 15px; border-radius: 6px; border: 1px solid rgba(255,255,255,0.05); gap: 20px;">
+                <div class="track-num" style="font-family: 'Space Mono', monospace; color: #64748b; width: 40px;">#{{
+                    item.id }}</div>
+                <div class="track-thumb" style="width: 50px; height: 50px; overflow: hidden; border-radius: 4px;">
+                    <img src="{{ item.thumbnail }}" alt="" style="width: 100%; height: 100%; object-fit: cover;">
+                </div>
+                <div class="track-info" style="flex: 2;">
+                    <div class="track-title" style="font-weight: bold; color: #ffffff;">{{ item.title }}</div>
+                    <div class="track-artist" style="color: #94a3b8; font-size: 13px;">{{ item.artist }}</div>
+                </div>
+                <div class="track-genre" style="flex: 1;">
+                    <span class="type-badge {{ item.media_type }}"
+                        style="padding: 4px 8px; border-radius: 3px; font-size: 11px; font-weight: bold; background: rgba(0,242,254,0.1); color: #00f2fe;">{{
+                        item.media_type.upper() }}</span>
+                </div>
+                <div class="track-duration" style="flex: 1; color: #cbd5e1; font-size: 14px;">{{ item.genre }}</div>
+                <div class="track-rating" style="color: #ffb800; font-family: 'Space Mono', monospace; width: 60px;">★
+                    {{ item.rating }}</div>
+            </div>
+            {% else %}
+            <p
+                style="color: #64748b; font-style: italic; background: rgba(255,255,255,0.01); padding: 20px; text-align: center; border-radius: 6px; border: 1px dashed rgba(255,255,255,0.1);">
+                No media found in database storage rows. Click "UPLOAD NEW MEDIA" above to populate tracks instantly.
+            </p>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+
+{% endblock %}

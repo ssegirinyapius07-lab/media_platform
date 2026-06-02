@@ -1,0 +1,88 @@
+{% extends 'base.html' %}
+{% block title %}{{ item.title }} — NEXUS{% endblock %}
+{% block content %}
+
+<div class="detail-page">
+    <div class="detail-hero" style="--thumb: url('{{ item.thumbnail }}')">
+        <div class="detail-bg"></div>
+        <div class="detail-content">
+            <div class="detail-thumb">
+                <img src="{{ item.thumbnail }}" alt="{{ item.title }}">
+                <div class="detail-glow"></div>
+            </div>
+            <div class="detail-info">
+                <div class="detail-type">{{ item.media_type.upper() }}</div>
+                <h1 class="detail-title">{{ item.title }}</h1>
+                <div class="detail-artist">by {{ item.artist }}</div>
+                <div class="detail-tags">
+                    <span class="tag">{{ item.genre }}</span>
+                    <span class="tag">{{ item.year }}</span>
+                    <span class="tag">{{ item.duration }}</span>
+                    <span class="tag rating">★ {{ item.rating }}</span>
+                </div>
+                <p class="detail-desc">{{ item.description }}</p>
+                <div class="detail-stats">
+                    <div class="dstat"><span class="dstat-val">{{ "{:,}".format(item.plays) }}</span><span
+                            class="dstat-label">Plays</span></div>
+                    <div class="dstat"><span class="dstat-val">{{ "{:,}".format(item.downloads_count) }}</span><span
+                            class="dstat-label">Downloads</span></div>
+                    <div class="dstat"><span class="dstat-val">★ {{ item.rating }}</span><span
+                            class="dstat-label">Rating</span></div>
+                </div>
+                <div class="detail-actions">
+                    {% if item.media_type == 'song' %}
+                    <!-- 🔥 FIXED: Added the url_for static route wrapper for the main item track player link -->
+                    <button class="btn-glow lg"
+                        onclick="playTrack('{{ item.id }}', '{{ item.title | escape }}', '{{ item.artist | escape }}', '{{ item.thumbnail }}', `{{ url_for('static', filename=item.file_path) if item.file_path else '' }}`)">
+                        ▶ PLAY NOW
+                    </button>
+                    {% endif %}
+                    <a href="{{ url_for('download_media', media_id=item.id) }}" class="download-button">
+                        ⬇ DOWNLOAD NOW
+                    </a>
+                    {% if not user %}
+                    <p class="login-note">⚡ <a href="/login">Sign in</a> or <a href="/register">register</a> to download
+                    </p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    {% if related %}
+    <div class="section">
+        <div class="section-header">
+            <h2 class="section-title"><span class="title-accent">◈</span> MORE LIKE THIS</h2>
+        </div>
+        <div class="cards-grid">
+            {% for r in related %}
+            <div class="card">
+                <div class="card-thumb">
+                    <img src="{{ r.thumbnail }}" alt="{{ r.title }}" loading="lazy">
+                    <div class="card-overlay">
+                        {% if r.media_type == 'song' %}
+                        <!-- 🔥 FIXED: Added the url_for static route wrapper for the related recommendations loop items -->
+                        <button class="play-overlay"
+                            onclick="playTrack('{{ r.id }}', '{{ r.title | escape }}', '{{ r.artist | escape }}', '{{ r.thumbnail }}', `{{ url_for('static', filename=r.file_path) if r.file_path else '' }}`)">▶</button>
+                        {% else %}
+                        <a href="/media/{{ r.id }}" class="play-overlay">▶</a>
+                        {% endif %}
+                    </div>
+                    <span class="type-badge {{ r.media_type }}">{{ r.media_type.upper() }}</span>
+                </div>
+                <div class="card-info">
+                    <a href="/media/{{ r.id }}" class="card-title">{{ r.title }}</a>
+                    <div class="card-artist">{{ r.artist }}</div>
+                    <div class="card-meta">
+                        <span class="meta-genre">{{ r.genre }}</span>
+                        <span class="meta-rating">★ {{ r.rating }}</span>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+    {% endif %}
+</div>
+
+{% endblock %}

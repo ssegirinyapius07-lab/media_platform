@@ -1,0 +1,319 @@
+{% extends 'base.html' %}
+
+{% block title %}NEXUS — Catalog Inventory{% endblock %}
+
+{% block content %}
+<style>
+    .admin-container {
+        display: flex;
+        min-height: calc(100vh - 70px);
+        background: #050b14;
+        color: #e2e8f0;
+        font-family: 'Exo 2', sans-serif;
+    }
+
+    .admin-sidebar {
+        width: 280px;
+        background: #07111e;
+        border-right: 1px solid rgba(0, 242, 254, 0.1);
+        padding: 30px 20px;
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+    }
+
+    .admin-sidebar-title {
+        font-family: 'Orbitron', sans-serif;
+        font-size: 11px;
+        letter-spacing: 2px;
+        color: #00f2fe;
+        opacity: 0.6;
+        margin-bottom: 15px;
+        font-weight: 700;
+    }
+
+    .admin-nav-link {
+        display: block;
+        padding: 14px 18px;
+        color: #94a3b8;
+        border-left: 3px solid transparent;
+        border-radius: 4px;
+        font-family: 'Orbitron', sans-serif;
+        font-size: 13px;
+        font-weight: 600;
+        text-decoration: none;
+        letter-spacing: 1px;
+        transition: all 0.2s ease;
+    }
+
+    .admin-nav-link:hover {
+        color: #e2e8f0;
+        background: rgba(255, 255, 255, 0.02);
+    }
+
+    .admin-nav-link.active {
+        color: #ff007f;
+        background: rgba(255, 0, 127, 0.1);
+        border-left: 3px solid #ff007f;
+    }
+
+    .admin-main {
+        flex: 1;
+        padding: 40px;
+        max-width: 1200px;
+        margin: 0 auto;
+        width: 100%;
+    }
+
+    .admin-header {
+        margin-bottom: 40px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .admin-header h1 {
+        font-family: 'Orbitron', sans-serif;
+        font-size: 32px;
+        font-weight: 900;
+        letter-spacing: 2px;
+        color: #ffffff;
+        margin-bottom: 8px;
+        text-transform: uppercase;
+    }
+
+    .admin-header p {
+        color: #94a3b8;
+        font-size: 15px;
+        margin: 0;
+    }
+
+    .deploy-btn {
+        background: #00f2fe;
+        color: #000;
+        text-decoration: none;
+        font-family: 'Orbitron', sans-serif;
+        font-weight: 900;
+        font-size: 12px;
+        letter-spacing: 1px;
+        padding: 14px 24px;
+        border-radius: 4px;
+        box-shadow: 0 0 15px rgba(0, 242, 254, 0.2);
+        transition: all 0.3s ease;
+    }
+
+    .deploy-btn:hover {
+        background: #00cad4;
+        box-shadow: 0 0 25px rgba(0, 242, 254, 0.4);
+        transform: translateY(-1px);
+    }
+
+    .table-responsive-wrapper {
+        overflow-x: auto;
+        background: #091524;
+        border-radius: 8px;
+        border: 1px solid rgba(255, 255, 255, 0.05);
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+    }
+
+    .nexus-table {
+        width: 100%;
+        border-collapse: collapse;
+        text-align: left;
+        font-size: 14px;
+    }
+
+    .nexus-table thead tr {
+        background: #03070d;
+        border-bottom: 2px solid rgba(255, 255, 255, 0.05);
+        font-family: 'Orbitron', sans-serif;
+        font-size: 11px;
+        color: #94a3b8;
+        letter-spacing: 1px;
+    }
+
+    .nexus-table th {
+        padding: 18px 20px;
+    }
+
+    .nexus-table td {
+        padding: 15px 20px;
+        vertical-align: middle;
+    }
+
+    .media-item-row {
+        border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        transition: background 0.2s, opacity 0.2s ease;
+        background: rgba(255, 255, 255, 0.01);
+        opacity: 1;
+    }
+
+    .media-item-row:hover {
+        background: rgba(255, 255, 255, 0.03);
+    }
+
+    .thumbnail-preview {
+        width: 45px;
+        height: 45px;
+        object-fit: cover;
+        border-radius: 4px;
+        border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .item-title {
+        font-weight: bold;
+        color: #fff;
+        font-family: 'Orbitron', sans-serif;
+        letter-spacing: 0.5px;
+    }
+
+    .artist-text {
+        color: #cbd5e1;
+    }
+
+    .type-badge {
+        font-size: 10px;
+        font-family: 'Orbitron', sans-serif;
+        padding: 4px 8px;
+        border-radius: 3px;
+        font-weight: bold;
+    }
+
+    .type-badge.song {
+        background: rgba(0, 242, 254, 0.15);
+        color: #00f2fe;
+        border: 1px solid #00f2fe;
+    }
+
+    .type-badge.movie {
+        background: rgba(255, 0, 127, 0.15);
+        color: #ff007f;
+        border: 1px solid #ff007f;
+    }
+
+    .genre-text {
+        color: #94a3b8;
+    }
+
+    .purge-btn {
+        background: transparent;
+        border: 1px solid #ef4444;
+        color: #ef4444;
+        padding: 6px 14px;
+        font-family: 'Orbitron', sans-serif;
+        font-size: 11px;
+        font-weight: bold;
+        border-radius: 4px;
+        cursor: pointer;
+        transition: all 0.2s;
+    }
+
+    .purge-btn:hover {
+        background: #ef4444;
+        color: #fff;
+        box-shadow: 0 0 10px rgba(239, 68, 68, 0.4);
+    }
+
+    .empty-state-text {
+        padding: 50px;
+        text-align: center;
+        color: #94a3b8;
+        font-family: 'Space Mono', monospace;
+    }
+</style>
+
+<div class="admin-container">
+    <aside class="admin-sidebar">
+        <div class="admin-sidebar-title">SYSTEM CORE</div>
+
+        <a href="/admin" class="admin-nav-link">⬡ CONTROL OVERVIEW</a>
+        <a href="/admin/upload" class="admin-nav-link">▲ UPLOAD FREQUENCY</a>
+        <a href="/admin/media" class="admin-nav-link active">◈ MANAGE EXISTING CATALOG</a>
+    </aside>
+
+    <main class="admin-main">
+        <div class="admin-header">
+            <div>
+                <h1>◈ PLATFORM INVENTORY</h1>
+                <p>Monitor and remove existing server assets compiled across the platform storage.</p>
+            </div>
+            <a href="/admin/upload" class="deploy-btn">+ DEPLOY NEW ASSET</a>
+        </div>
+
+        <div class="table-responsive-wrapper">
+            <table class="nexus-table">
+                <thead>
+                    <tr>
+                        <th>PREVIEW</th>
+                        <th>TITLE</th>
+                        <th>ARTIST / STUDIO</th>
+                        <th>TYPE</th>
+                        <th>GENRE</th>
+                        <th style="text-align: center;">ACTIONS</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for item in items %}
+                    <tr id="media-row-{{ item.id }}" class="media-item-row">
+                        <td>
+                            <img src="{{ item.thumbnail }}" class="thumbnail-preview" alt="Asset Graphical Thumb">
+                        </td>
+                        <td class="item-title">{{ item.title }}</td>
+                        <td class="artist-text">{{ item.artist }}</td>
+                        <td>
+                            {% if item.media_type == 'song' %}
+                            <span class="type-badge song">SONG</span>
+                            {% else %}
+                            <span class="type-badge movie">{{ item.media_type.upper() }}</span>
+                            {% endif %}
+                        </td>
+                        <td class="genre-text">{{ item.genre }}</td>
+                        <td style="text-align: center;">
+                            <button onclick="deleteMedia('{{ item.id }}')" class="purge-btn">
+                                PURGE ASSET
+                            </button>
+                        </td>
+                    </tr>
+                    {% else %}
+                    <tr>
+                        <td colspan="6" class="empty-state-text">
+                            No system metadata rows located in server database infrastructure.
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </main>
+</div>
+
+<script>
+    async function deleteMedia(mediaId) {
+        if (!confirm("Are you certain you want to purge this asset record from database matrices permanently?")) {
+            return;
+        }
+
+        try {
+            // Direct communication hook connecting cleanly into your backend API routes
+            const response = await fetch(`/admin/media/delete/${mediaId}`, {
+                method: 'POST'
+            });
+
+            const data = await response.json();
+
+            if (data.success) {
+                const element = document.getElementById(`media-row-${mediaId}`);
+                if (element) {
+                    element.style.opacity = '0'; // Execute graphical drop animation
+                    setTimeout(() => element.remove(), 200); // Purge cleanly from browser DOM trees
+                }
+            } else {
+                alert("Database structural exception during record drop execution.");
+            }
+        } catch (err) {
+            console.error("Critical core terminal disconnect error:", err);
+            alert("Could not establish communication connection pipeline back to server.");
+        }
+    }
+</script>
+{% endblock %}

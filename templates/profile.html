@@ -1,0 +1,62 @@
+{% extends 'base.html' %}
+{% block title %}{{ user.username }} — NEXUS{% endblock %}
+{% block content %}
+
+<div class="profile-page">
+    <div class="profile-hero">
+        <div class="profile-avatar-lg">{{ user.username[0].upper() }}</div>
+        <div class="profile-details">
+            <h1>{{ user.username }}</h1>
+            <p class="profile-email">{{ user.email }}</p>
+            <div class="profile-badges">
+                <span class="badge member">MEMBER</span>
+                {% if user.is_premium %}<span class="badge premium">PREMIUM</span>{% endif %}
+                <span class="badge joined">Joined {{ user.created_at.strftime('%b %Y') }}</span>
+            </div>
+        </div>
+    </div>
+
+    <div class="profile-body">
+        <div class="profile-stats">
+            <div class="pstat">
+                <span class="pstat-val">{{ downloads|length }}</span>
+                <span class="pstat-label">Downloads</span>
+            </div>
+            <div class="pstat">
+                <span class="pstat-val">∞</span>
+                <span class="pstat-label">Streams</span>
+            </div>
+            <div class="pstat">
+                <span class="pstat-val">★</span>
+                <span class="pstat-label">Member</span>
+            </div>
+        </div>
+
+        <div class="profile-section">
+            <h2>DOWNLOAD HISTORY</h2>
+            {% if downloads %}
+            <div class="dl-history">
+                {% for item in downloads %}
+                <a href="/media/{{ item.id }}" class="dl-item">
+                    <img src="{{ item.thumbnail }}" alt="{{ item.title }}">
+                    <div class="dl-item-info">
+                        <div class="dl-item-title">{{ item.title }}</div>
+                        <div class="dl-item-artist">{{ item.artist }}</div>
+                        <span class="type-badge {{ item.media_type }} sm">{{ item.media_type.upper() }}</span>
+                    </div>
+                    <div class="dl-item-action">→</div>
+                </a>
+                {% endfor %}
+            </div>
+            {% else %}
+            <div class="empty-state">
+                <div class="empty-icon">⬇</div>
+                <p>No downloads yet</p>
+                <a href="/browse" class="btn-glow">Browse Media</a>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+{% endblock %}

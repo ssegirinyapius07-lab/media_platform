@@ -1,0 +1,113 @@
+{% extends 'base.html' %}
+{% block title %}Browse — NEXUS{% endblock %}
+{% block content %}
+
+<div class="browse-page">
+    <div class="browse-header">
+        <h1 class="page-title">
+            {% if media_type == 'song' %}♪ MUSIC LIBRARY
+            {% elif media_type == 'movie' %}◉ FILM VAULT
+            {% else %}◈ BROWSE ALL
+            {% endif %}
+        </h1>
+        <p>{{ total }} titles found</p>
+    </div>
+
+    <div class="filters-bar">
+        <div class="type-filters">
+            <a href="/browse" class="filter-btn {% if media_type=='all' or not media_type %}active{% endif %}">ALL</a>
+            <a href="/browse?type=song" class="filter-btn {% if media_type=='song' %}active{% endif %}">MUSIC</a>
+            <a href="/browse?type=movie" class="filter-btn {% if media_type=='movie' %}active{% endif %}">FILMS</a>
+        </div>
+        <div class="search-bar">
+            <input type="text" id="searchInput" placeholder="Search titles, artists..." value="{{ search }}"
+                onkeyup="if(event.key==='Enter') doSearch()">
+            <button onclick="doSearch()">⌕</button>
+        </div>
+        <div class="genre-filters">
+            <select id="genreFilter" onchange="doFilter()">
+                <option value="">All Genres</option>
+                <option value="Synthwave" {% if genre=='Synthwave' %}selected{% endif %}>Synthwave</option>
+                <option value="Cyberpunk" {% if genre=='Cyberpunk' %}selected{% endif %}>Cyberpunk</option>
+                <option value="Lo-Fi" {% if genre=='Lo-Fi' %}selected{% endif %}>Lo-Fi / Chill</option>
+                <option value="Sci-Fi Soundtracks" {% if genre=='Sci-Fi Soundtracks' %}selected{% endif %}>Sci-Fi
+                    Soundtrack</option>
+                <option value="Electro House" {% if genre=='Electro House' %}selected{% endif %}>Electro House</option>
+                <option value="Cinematic" {% if genre=='Cinematic' %}selected{% endif %}>Cinematic Ambient</option>
+                <option value="Electronic" {% if genre=='Electronic' %}selected{% endif %}>Electronic (Legacy)</option>
+                <option value="Hip-Hop" {% if genre=='Hip-Hop' %}selected{% endif %}>Hip-Hop</option>
+                <option value="Ambient" {% if genre=='Ambient' %}selected{% endif %}>Ambient</option>
+                <option value="Sci-Fi" {% if genre=='Sci-Fi' %}selected{% endif %}>Sci-Fi</option>
+            </select>
+        </div>
+    </div>
+
+    <div class="browse-grid" id="browseGrid">
+        {% for item in items %}
+        <div class="browse-card" data-type="{{ item.media_type }}">
+            <div class="browse-thumb">
+                <img src="{{ item.thumbnail }}" alt="{{ item.title }}" loading="lazy">
+                <div class="browse-overlay">
+                    {% if item.media_type == 'song' %}
+                    <!-- 🔥 FIXED: Added the url_for static route wrapper cleanly into the JavaScript parameter array -->
+                    <button class="play-big"
+                        onclick="playTrack('{{ item.id }}', '{{ item.title | escape }}', '{{ item.artist | escape }}', '{{ item.thumbnail }}', `{{ url_for('static', filename=item.file_path) if item.file_path else '' }}`)">▶</button>
+                    {% else %}
+                    <a href="/media/{{ item.id }}" class="play-big">▶</a>
+                    {% endif %}
+                    <a href="/download/{{ item.id }}" class="dl-big"
+                        onclick="handleDownload(event, '{{ item.id }}')">⬇</a>
+                </div>
+                <span class="type-badge {{ item.media_type }}">{{ item.media_type.upper() }}</span>
+            </div>
+            <div class="browse-info">
+                <a href="/media/{{ item.id }}" class="browse-title">{{ item.title }}</a>
+                <div class="browse-artist">{{ item.artist }}</div>
+                <div class="browse-meta">
+                    <span>{{ item.genre }}</span>
+                    <span>{{ item.year }}</span>
+                    <span class="rating-sm">★ {{ item.rating }}</span>
+                </div>
+            </div>
+        </div>
+        {% else %}
+        <div class="no-results">
+            <div class="no-results-icon">◈</div>
+            <p>No results found. Try different filters.</p>
+            <a href="/browse" class="btn-outline">Clear Filters</a>
+        </div>
+        {% endfor %}
+    </div>
+
+    {% if total > per_page %}
+    <div class="pagination">
+        {% if page > 1 %}
+        <a href="?type={{ media_type }}&page={{ page-1 }}&q={{ search }}&genre={{ genre }}" class="page-btn">← PREV</a>
+        {% endif %}
+        <span class="page-info">{{ page }} / {{ ((total-1)//per_page)+1 }}</span>
+        {% if page * per_page < total %} <a
+            href="?type={{ media_type }}&page={{ page+1 }}&q={{ search }}&genre={{ genre }}" class="page-btn">NEXT →</a>
+            {% endif %}
+    </div>
+    {% endif %}
+</div>
+
+{% endblock %}
+
+{% block scripts %}
+<script>
+    function doSearch() {
+        const q = document.getElementById('searchInput').value;
+        const type = new URLSearchParams(window.location.search).get('type') || 'all';
+        const genre = document.getElementById('genreFilter').value;
+        window.location = `/browse?type=${type}&q=${encodeURIComponent(q)}&genre=${genre}`;
+    }
+
+    function doFilter() {
+        const q = document.getElementById('searchInput').value;
+        const type = new URLSearchParams(window.location.search).get('type') || 'all';
+        const genre = document.getElementById('genreFilter').value;
+        window.location = `/browse?type=${type}&q=${encodeURIComponent(q)}&genre=${genre}`;
+    }
+</script>
+{% endblock %}

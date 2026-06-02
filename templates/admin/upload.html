@@ -1,0 +1,313 @@
+{% extends 'base.html' %}
+
+{% block title %}NEXUS — Upload Stream{% endblock %}
+
+{% block content %}
+<div class="admin-container"
+    style="display: flex; min-height: calc(100vh - 70px); background: #050b14; color: #e2e8f0; font-family: 'Exo 2', sans-serif;">
+
+    <aside class="admin-sidebar"
+        style="width: 280px; background: #07111e; border-right: 1px solid rgba(0, 242, 254, 0.1); padding: 30px 20px; display: flex; flex-direction: column; gap: 10px;">
+        <div class="admin-sidebar-title"
+            style="font-family: 'Orbitron', sans-serif; font-size: 11px; letter-spacing: 2px; color: #00f2fe; opacity: 0.6; margin-bottom: 15px; font-weight: 700;">
+            SYSTEM CORE</div>
+        <a href="/admin" class="admin-nav-link"
+            style="display: block; padding: 14px 18px; color: #94a3b8; text-decoration: none; font-family: 'Orbitron', sans-serif; font-size: 13px;">⬡
+            CONTROL OVERVIEW</a>
+        <a href="/admin/upload" class="admin-nav-link active"
+            style="display: block; padding: 14px 18px; color: #00f2fe; background: rgba(0, 242, 254, 0.1); border-left: 3px solid #00f2fe; text-decoration: none; font-family: 'Orbitron', sans-serif; font-size: 13px;">▲
+            UPLOAD FREQUENCY</a>
+        <a href="/admin/media" class="admin-nav-link"
+            style="display: block; padding: 14px 18px; color: #94a3b8; text-decoration: none; font-family: 'Orbitron', sans-serif; font-size: 13px;">◈
+            MANAGE EXISTING CATALOG</a>
+    </aside>
+
+    <main class="admin-main" style="flex: 1; padding: 40px; max-width: 1200px; margin: 0 auto; width: 100%;">
+        <div class="admin-header" style="margin-bottom: 40px;">
+            <h1
+                style="font-family: 'Orbitron', sans-serif; font-size: 32px; font-weight: 900; letter-spacing: 2px; color: #ffffff; margin-bottom: 8px;">
+                ▲ PROVISION NEW STREAM</h1>
+            <p style="color: #94a3b8; font-size: 15px;">Inject new media streams directly into the core SQLite
+                architecture matrix.</p>
+        </div>
+
+        <div id="statusNotification"
+            style="display: none; padding: 15px; border-radius: 4px; margin-bottom: 20px; font-family: 'Space Mono', monospace; font-size: 14px; text-transform: uppercase; text-align: center; font-weight: bold;">
+        </div>
+
+        <form id="uploadForm" enctype="multipart/form-data" method="POST" action="/admin/upload"
+            style="background: linear-gradient(145deg, #091524, #0b1a2d); padding: 30px; border-radius: 8px; border: 1px solid rgba(0,242,254,0.1); display: flex; flex-direction: column; gap: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.5);">
+
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+                <div>
+                    <label
+                        style="display: block; font-size: 12px; font-family: 'Orbitron', sans-serif; color: #94a3b8; margin-bottom: 8px;">
+                        MEDIA STREAM TYPE
+                    </label>
+                    <select name="media_type" id="media_type"
+                        style="width: 100%; background: #03070d; border: 1px solid rgba(0, 242, 254, 0.2); padding: 12px; border-radius: 4px; color: #fff; font-family: 'Exo 2';">
+                        <option value="song">Music Track (Audio Stream)</option>
+                        <option value="movie">Film Asset (Video Stream)</option>
+                    </select>
+                </div>
+                <div>
+                    <label id="titleLabel"
+                        style="display: block; font-size: 12px; font-family: 'Orbitron', sans-serif; color: #94a3b8; margin-bottom: 8px;">
+                        TRACK TITLE
+                    </label>
+                    <input type="text" name="title" required placeholder="e.g. Neon Protocol"
+                        style="width: 100%; background: #03070d; border: 1px solid rgba(255,255,255,0.1); padding: 12px; border-radius: 4px; color: #fff;">
+                </div>
+            </div>
+
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+                <div>
+                    <label id="artistLabel"
+                        style="display: block; font-size: 12px; font-family: 'Orbitron', sans-serif; color: #94a3b8; margin-bottom: 8px;">
+                        ARTIST / PRODUCER
+                    </label>
+                    <input type="text" name="artist" required placeholder="e.g. Alex Vance"
+                        style="width: 100%; background: #03070d; border: 1px solid rgba(255,255,255,0.1); padding: 12px; border-radius: 4px; color: #fff;">
+                </div>
+                <div>
+                    <label
+                        style="display: block; font-size: 12px; font-family: 'Orbitron', sans-serif; color: #94a3b8; margin-bottom: 8px;">
+                        GENRE CLASSIFICATION
+                    </label>
+                    <select name="genre" id="genreFilter"
+                        style="width: 100%; background: #03070d; border: 1px solid rgba(255,255,255,0.1); padding: 12px; border-radius: 4px; color: #fff; font-family: 'Exo 2';">
+                    </select>
+                </div>
+            </div>
+
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+                <div>
+                    <label
+                        style="display: block; font-size: 12px; font-family: 'Orbitron', sans-serif; color: #94a3b8; margin-bottom: 8px;">
+                        RELEASE YEAR
+                    </label>
+                    <input type="number" name="year" value="2026"
+                        style="width: 100%; background: #03070d; border: 1px solid rgba(255,255,255,0.1); padding: 12px; border-radius: 4px; color: #fff;">
+                </div>
+                <div>
+                    <label
+                        style="display: block; font-size: 12px; font-family: 'Orbitron', sans-serif; color: #94a3b8; margin-bottom: 8px;">
+                        TIME RUNTIME DURATION
+                    </label>
+                    <input type="text" name="duration" id="durationInput" readonly
+                        placeholder="Auto-calculated on file choice..."
+                        style="width: 100%; background: #0c1524; border: 1px solid rgba(0,242,254,0.3); padding: 12px; border-radius: 4px; color: #00f2fe; font-family: 'Space Mono'; font-weight: bold;">
+                </div>
+            </div>
+
+            <div>
+                <label
+                    style="display: block; font-size: 12px; font-family: 'Orbitron', sans-serif; color: #94a3b8; margin-bottom: 8px;">
+                    CHOOSE COVER ARTWORK IMAGE FILE (.jpg, .png)
+                </label>
+                <input type="file" name="thumbnail_file" accept="image/*" required
+                    style="width: 100%; background: #03070d; border: 1px solid rgba(255,255,255,0.1); padding: 10px; border-radius: 4px; color: #fff;">
+            </div>
+
+            <div>
+                <label id="fileLabel"
+                    style="display: block; font-size: 12px; font-family: 'Orbitron', sans-serif; color: #94a3b8; margin-bottom: 8px;">
+                    SELECT AUDIO FILE (.MP3/.WAV)
+                </label>
+                <input type="file" name="media_file" id="mediaFileInput" accept="audio/*" required
+                    style="width: 100%; background: #03070d; border: 1px solid rgba(0,242,254,0.1); padding: 10px; border-radius: 4px; color: #fff; font-family: 'Space Mono';">
+            </div>
+
+            <button type="submit" id="submitBtn"
+                style="background: linear-gradient(90deg, #00f2fe, #4facfe); border: none; padding: 15px; color: #000; font-family: 'Orbitron', sans-serif; font-weight: 900; letter-spacing: 1px; border-radius: 4px; cursor: pointer; font-size: 14px; text-transform: uppercase;">
+                DEPLOY NEW MEDIA TO SYSTEM
+            </button>
+        </form>
+    </main>
+</div>
+
+<script>
+    function adjustFileLabels() {
+        const typeSelect = document.getElementById('media_type');
+        const genreFilter = document.getElementById('genreFilter');
+        if (!typeSelect || !genreFilter) return;
+
+        const type = typeSelect.value;
+        const titleLabel = document.getElementById('titleLabel');
+        const artistLabel = document.getElementById('artistLabel');
+        const fileLabel = document.getElementById('fileLabel');
+        const fileInput = document.getElementById('mediaFileInput');
+
+        genreFilter.innerHTML = "";
+
+        if (type === 'movie') {
+            if (titleLabel) titleLabel.innerText = "FILM / VIDEO TITLE";
+            if (artistLabel) artistLabel.innerText = "DIRECTOR / STUDIO";
+            if (fileLabel) fileLabel.innerText = "SELECT VIDEO FILE (.MP4/.MKV)";
+            if (fileInput) fileInput.accept = "video/*";
+
+            const movieGenres = [
+                "Sci-Fi", "Love Story", "Romantic Drama", "Drama", "Action", "Thriller",
+                "Cyberpunk Cinema", "Horror", "Psychological Thriller", "Comedy",
+                "Documentary", "Anime / Animation", "Adventure", "Fantasy",
+                "Crime / Mystery", "Historical / Period", "Indie / Experimental"
+            ];
+
+            movieGenres.forEach(genre => {
+                let opt = document.createElement('option');
+                opt.value = genre;
+                opt.innerHTML = genre;
+                genreFilter.appendChild(opt);
+            });
+        } else {
+            if (titleLabel) titleLabel.innerText = "TRACK TITLE";
+            if (artistLabel) artistLabel.innerText = "ARTIST / PRODUCER";
+            if (fileLabel) fileLabel.innerText = "SELECT AUDIO FILE (.MP3/.WAV)";
+            if (fileInput) fileInput.accept = "audio/*";
+
+            const musicGenres = [
+                "Afrobeat", "Hip-Hop", "Synthwave", "Lo-Fi / Chill", "Electro House", "Ambient",
+                "Amapiano", "R&B / Soul", "Reggae / Dancehall", "Trap", "Pop / Dance",
+                "Techno / Industrial", "Drum & Bass", "Deep House", "Phonk",
+                "Cyberpunk Electro", "Cinematic Score", "Rock / Indie Metal"
+            ];
+
+            musicGenres.forEach(genre => {
+                let opt = document.createElement('option');
+                opt.value = genre;
+                opt.innerHTML = genre;
+                genreFilter.appendChild(opt);
+            });
+        }
+    }
+
+    function calculateFileDuration(input) {
+        const file = input.files[0];
+        const durationInput = document.getElementById('durationInput');
+        if (!file || !durationInput) return;
+
+        durationInput.value = "Calculating vectors...";
+        const element = document.createElement(file.type.startsWith('video') ? 'video' : 'audio');
+        element.src = URL.createObjectURL(file);
+
+        element.onloadedmetadata = function () {
+            const secondsTotal = Math.floor(element.duration);
+            const hrs = Math.floor(secondsTotal / 3600);
+            const mins = Math.floor((secondsTotal % 3600) / 60);
+            const secs = secondsTotal % 60;
+
+            if (hrs > 0) {
+                durationInput.value = `${hrs}h ${mins}m`;
+            } else {
+                durationInput.value = `${mins}:${secs.toString().padStart(2, '0')}`;
+            }
+            URL.revokeObjectURL(element.src);
+        };
+
+        element.onerror = function () {
+            durationInput.value = "0:00";
+        };
+    }
+
+    // Intercept submit button click routine to prevent the raw JSON white screen error
+    function handleFormSubmission(event) {
+        event.preventDefault(); // HALT page load context split
+
+        const form = document.getElementById('uploadForm');
+        const submitBtn = document.getElementById('submitBtn');
+        const statusBox = document.getElementById('statusNotification');
+
+        if (!form) return;
+
+        // Build data structure vectors dynamically
+        const formData = new FormData(form);
+
+        // Update UI state to show active deployment operations
+        if (submitBtn) {
+            submitBtn.disabled = true;
+            submitBtn.innerText = "DEPLOYING STREAM VECTORS...";
+            submitBtn.style.background = "#1e293b";
+            submitBtn.style.color = "#64748b";
+        }
+
+        if (statusBox) {
+            statusBox.style.display = "block";
+            statusBox.style.background = "rgba(0, 242, 254, 0.1)";
+            statusBox.style.border = "1px solid #00f2fe";
+            statusBox.style.color = "#00f2fe";
+            statusBox.innerText = "TRANSMITTING MEDIA FILES TO SQLITE ARCHITECTURE MATRIX...";
+        }
+
+        // Send backend asynchronously without updating the active URL environment
+        fetch(form.action, {
+            method: 'POST',
+            body: formData
+        })
+            .then(response => response.json())
+            .then(data => {
+                // Re-enable interactive layout triggers
+                if (submitBtn) {
+                    submitBtn.disabled = false;
+                    submitBtn.innerText = "DEPLOY NEW MEDIA TO SYSTEM";
+                    submitBtn.style.background = "linear-gradient(90deg, #00f2fe, #4facfe)";
+                    submitBtn.style.color = "#000";
+                }
+
+                if (data.success) {
+                    if (statusBox) {
+                        statusBox.style.background = "rgba(16, 185, 129, 0.1)";
+                        statusBox.style.border = "1px solid #10b981";
+                        statusBox.style.color = "#10b981";
+                        statusBox.innerText = `SUCCESS: "${data.title.toUpperCase()}" INJECTED INTO THE ARCHITECTURE MATRIX!`;
+                    }
+                    form.reset();
+                    adjustFileLabels(); // Repopulate list vectors down to initial baseline
+                } else {
+                    throw new Error(data.message || "Pipeline integration failure.");
+                }
+            })
+            .catch(error => {
+                if (submitBtn) {
+                    submitBtn.disabled = false;
+                    submitBtn.innerText = "DEPLOY NEW MEDIA TO SYSTEM";
+                    submitBtn.style.background = "linear-gradient(90deg, #00f2fe, #4facfe)";
+                    submitBtn.style.color = "#000";
+                }
+                if (statusBox) {
+                    statusBox.style.background = "rgba(239, 68, 68, 0.1)";
+                    statusBox.style.border = "1px solid #ef4444";
+                    statusBox.style.color = "#ef4444";
+                    statusBox.innerText = `TRANSMISSION ERROR: ${error.message.toUpperCase()}`;
+                }
+            });
+    }
+
+    function setupUploadInterface() {
+        const typeSelect = document.getElementById('media_type');
+        const fileInput = document.getElementById('mediaFileInput');
+        const form = document.getElementById('uploadForm');
+
+        if (typeSelect) {
+            typeSelect.onchange = null;
+            typeSelect.addEventListener('change', adjustFileLabels);
+        }
+
+        if (fileInput) {
+            fileInput.addEventListener('change', function () {
+                calculateFileDuration(this);
+            });
+        }
+
+        if (form) {
+            form.addEventListener('submit', handleFormSubmission);
+        }
+
+        adjustFileLabels();
+    }
+
+    // Direct registration vectors
+    setupUploadInterface();
+    document.addEventListener("DOMContentLoaded", setupUploadInterface);
+    window.addEventListener("load", setupUploadInterface);
+</script>
+{% endblock %}

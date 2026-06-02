@@ -1,0 +1,182 @@
+{% extends 'base.html' %}
+{% block title %}NEXUS — Media Universe{% endblock %}
+{% block content %}
+
+<!-- HERO -->
+<section class="hero">
+    <div class="hero-particles" id="particles"></div>
+    <div class="hero-content">
+        <div class="hero-eyebrow">WELCOME TO THE FUTURE OF MEDIA</div>
+        <h1 class="hero-title">
+            <span class="glitch" data-text="STREAM">STREAM</span><br>
+            <span class="hero-accent">EVERYTHING</span>
+        </h1>
+        <p class="hero-sub">Millions of songs, films & more — in stunning quality. Stream free, download with an
+            account.</p>
+        <div class="hero-btns">
+            <a href="/browse" class="btn-glow lg">EXPLORE NOW</a>
+            {% if not user %}<a href="/register" class="btn-outline lg">JOIN FOR FREE</a>{% endif %}
+        </div>
+        <div class="hero-stats">
+            <div class="stat"><span class="stat-num">10K+</span><span class="stat-label">Tracks</span></div>
+            <div class="stat"><span class="stat-num">5K+</span><span class="stat-label">Films</span></div>
+            <div class="stat"><span class="stat-num">4K</span><span class="stat-label">Quality</span></div>
+            <div class="stat"><span class="stat-num">FREE</span><span class="stat-label">To Browse</span></div>
+        </div>
+    </div>
+    <div class="hero-visual">
+        <div class="orb orb-1"></div>
+        <div class="orb orb-2"></div>
+        <div class="orb orb-3"></div>
+        <div class="vinyl-disc">
+            <div class="vinyl-inner"></div>
+        </div>
+    </div>
+</section>
+
+<!-- FEATURED -->
+<section class="section">
+    <div class="section-header">
+        <h2 class="section-title"><span class="title-accent">◈</span> TRENDING NOW</h2>
+        <a href="/browse" class="see-all">VIEW ALL →</a>
+    </div>
+    <div class="cards-grid featured-grid">
+        {% for item in featured %}
+        <div class="card featured-card" data-id="{{ item.id }}" data-type="{{ item.media_type }}">
+            <div class="card-thumb">
+                <img src="{{ item.thumbnail }}" alt="{{ item.title }}" loading="lazy">
+                <div class="card-overlay">
+                    {% if item.media_type == 'song' %}
+                    <!-- FIXED: Added the 5th parameter targeting the static file_path destination URL -->
+                    <button class="play-overlay"
+                        onclick="playTrack('{{ item.id }}', '{{ item.title }}', '{{ item.artist }}', '{{ item.thumbnail }}', `{{ url_for('static', filename=item.file_path) if item.file_path else '' }}`)">▶</button>
+                    {% else %}
+                    <a href="/media/{{ item.id }}" class="play-overlay">▶</a>
+                    {% endif %}
+                </div>
+                <span class="type-badge {{ item.media_type }}">{{ item.media_type.upper() }}</span>
+                <div class="card-glow"></div>
+            </div>
+            <div class="card-info">
+                <a href="/media/{{ item.id }}" class="card-title">{{ item.title }}</a>
+                <div class="card-artist">{{ item.artist }}</div>
+                <div class="card-meta">
+                    <span class="meta-genre">{{ item.genre }}</span>
+                    <span class="meta-rating">★ {{ item.rating }}</span>
+                </div>
+                <div class="card-plays">{{ "{:,}".format(item.plays) }} plays</div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</section>
+
+<!-- MUSIC SECTION -->
+<section class="section alt-section">
+    <div class="section-header">
+        <h2 class="section-title"><span class="title-accent">♪</span> LATEST MUSIC</h2>
+        <a href="/browse?type=song" class="see-all">ALL MUSIC →</a>
+    </div>
+    <div class="track-list">
+        {% for song in songs %}
+        <!-- FIXED: Passed the static file resolver link down to the client layout play engine -->
+        <div class="track-row"
+            onclick="playTrack('{{ song.id }}', '{{ song.title }}', '{{ song.artist }}', '{{ song.thumbnail }}', `{{ url_for('static', filename=song.file_path) if song.file_path else '' }}`)">
+            <div class="track-num">{{ loop.index }}</div>
+            <div class="track-thumb"><img src="{{ song.thumbnail }}" alt="{{ song.title }}"></div>
+            <div class="track-info">
+                <div class="track-title">{{ song.title }}</div>
+                <div class="track-artist">{{ song.artist }}</div>
+            </div>
+            <div class="track-genre">{{ song.genre }}</div>
+            <div class="track-duration">{{ song.duration }}</div>
+            <div class="track-rating">★ {{ song.rating }}</div>
+            <div class="track-actions">
+                <button class="action-btn play-btn-sm">▶</button>
+                <a href="/download/{{ song.id }}" class="action-btn dl-btn"
+                    onclick="handleDownload(event, '{{ song.id }}')">⬇</a>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</section>
+
+<!-- MOVIES SECTION -->
+<section class="section">
+    <div class="section-header">
+        <h2 class="section-title"><span class="title-accent">◉</span> FILMS & SERIES</h2>
+        <a href="/browse?type=movie" class="see-all">ALL FILMS →</a>
+    </div>
+    <div class="movies-grid">
+        {% for movie in movies %}
+        <a href="/media/{{ movie.id }}" class="movie-card">
+            <div class="movie-poster">
+                <img src="{{ movie.thumbnail }}" alt="{{ movie.title }}">
+                <div class="movie-overlay">
+                    <span class="movie-play">▶ WATCH</span>
+                </div>
+                <div class="movie-rating">★ {{ movie.rating }}</div>
+            </div>
+            <div class="movie-info">
+                <div class="movie-title">{{ movie.title }}</div>
+                <div class="movie-meta">{{ movie.genre }} · {{ movie.year }} · {{ movie.duration }}</div>
+            </div>
+        </a>
+        {% endfor %}
+    </div>
+</section>
+
+<!-- CTA BANNER -->
+{% if not user %}
+<section class="cta-banner">
+    <div class="cta-content">
+        <div class="cta-glow"></div>
+        <h2>UNLOCK FULL ACCESS</h2>
+        <p>Create a free account to download music, films, and stream in HD quality</p>
+        <div class="cta-features">
+            <span>✓ Unlimited Downloads</span>
+            <span>✓ HD Streaming</span>
+            <span>✓ Offline Access</span>
+            <span>✓ 100% Free</span>
+        </div>
+        <a href="/register" class="btn-glow lg">CREATE FREE ACCOUNT</a>
+    </div>
+</section>
+{% endif %}
+
+{% endblock %}
+
+{% block scripts %}
+<script>
+    // Particle background
+    const canvas = document.createElement('canvas');
+    const pc = document.getElementById('particles');
+    canvas.width = pc.offsetWidth; canvas.height = pc.offsetHeight;
+    pc.appendChild(canvas);
+    const ctx = canvas.getContext('2d');
+    const pts = Array.from({ length: 60 }, () => ({
+        x: Math.random() * canvas.width, y: Math.random() * canvas.height,
+        vx: (Math.random() - .5) * .4, vy: (Math.random() - .5) * .4,
+        r: Math.random() * 2 + 1
+    }));
+    function animPart() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        pts.forEach(p => {
+            p.x += p.vx; p.y += p.vy;
+            if (p.x < 0 || p.x > canvas.width) p.vx *= -1;
+            if (p.y < 0 || p.y > canvas.height) p.vy *= -1;
+            ctx.beginPath(); ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+            ctx.fillStyle = 'rgba(0,255,200,.4)'; ctx.fill();
+        });
+        pts.forEach((a, i) => pts.slice(i + 1).forEach(b => {
+            const d = Math.hypot(a.x - b.x, a.y - b.y);
+            if (d < 100) {
+                ctx.beginPath(); ctx.moveTo(a.x, a.y); ctx.lineTo(b.x, b.y);
+                ctx.strokeStyle = `rgba(0,255,200,${.15 * (1 - d / 100)})`; ctx.stroke();
+            }
+        }));
+        requestAnimationFrame(animPart);
+    }
+    animPart();
+</script>
+{% endblock %}

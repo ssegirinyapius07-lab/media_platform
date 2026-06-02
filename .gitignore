@@ -1,0 +1,15 @@
+# Ignore Database
+instance/nexus.db
+
+# Ignore Python cache and virtual environments
+__pycache__/
+.venv/
+venv/
+env/
+
+# Ignore uploaded media (so you don't push massive files to GitHub)
+static/uploads/
+
+# Ignore IDE settings
+.vscode/
+.DS_Store
